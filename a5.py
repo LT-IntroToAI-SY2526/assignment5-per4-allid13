@@ -1,6 +1,6 @@
 import copy  # to make a deepcopy of the board
 from typing import List, Any, Tuple
-
+import time
 # import Stack and Queue classes for BFS/DFS
 from stack_and_queue import Stack, Queue
 
@@ -58,6 +58,7 @@ class Board:
         """String representation of the board"""
         row_str = ""
         for r in self.rows:
+
             row_str += f"{r}\n"
 
         return f"num_nums_placed: {self.num_nums_placed}\nboard (rows): \n{row_str}"
@@ -186,11 +187,17 @@ def DFS(state: Board) -> Board:
 
     the_stack= Stack()
     the_stack.push(state)
+    iterations=0
+    start_time=time.time()
 
     while not the_stack.is_empty():
+        iterations+=1
         current_board: Board = the_stack.pop()
         # print(current_board)
         if current_board.goal_test():
+            end_time=time.time()
+            elapsed_time = end_time - start_time
+            print(f"DFS took {iterations} iterations in {elapsed_time: .4f} seconds")
             return current_board
         
         row, col= current_board.find_most_constrained_cell()
@@ -202,7 +209,6 @@ def DFS(state: Board) -> Board:
                 new_board.update(row, col, val)
                 the_stack.push(new_board)
     return None
-                
 
 
 def BFS(state: Board) -> Board:
@@ -217,6 +223,27 @@ def BFS(state: Board) -> Board:
     Returns:
         either None in the case of invalid input or a solved board
     """
+    the_queue=Queue()
+    the_queue.push(state)
+    iterations=0
+    start_time= time.time()
+    while not the_queue.is_empty():
+        iterations+=1
+        current_board: Board=the_queue.pop()
+        if current_board.goal_test():
+            end_time=time.time()
+            elapsed_time=end_time-start_time
+            print(f"BFS took {iterations} iterations in {elapsed_time: .4f} seconds ")
+            return current_board
+        row,col=current_board.find_most_constrained_cell()
+        possible_values=current_board.rows[row][col]
+        if not current_board.failure_test():
+            for val in possible_values:
+                new_board=copy.deepcopy(current_board)
+                new_board.update(row,col, val)
+                the_queue.push(new_board)
+    return None
+
     
 
 
